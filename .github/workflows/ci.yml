@@ -1,0 +1,47 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  build-and-smoke-test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Build images
+        run: docker compose build
+
+      - name: Start stack
+        run: docker compose up -d
+
+      - name: Smoke test through nginx
+        run: |
+          response=""
+          for i in $(seq 1 30); do
+            if response=$(curl -fs http://localhost); then
+              break
+            fi
+            sleep 1
+          done
+          echo "Response: $response"
+          test "$response" = "Hello from DevOps Example!"
+
+      - name: Backend must not be exposed on the host
+        run: |
+          if curl -fs --max-time 2 http://localhost:8080; then
+            echo "ERROR: backend is reachable directly, bypassing nginx"
+            exit 1
+          fi
+
+      - name: Show container logs on failure
+        if: failure()
+        run: docker compose logs
+
+      - name: Cleanup
+        if: always()
+        run: docker compose down

@@ -1,11 +1,16 @@
 # DevOps Example — DevOps Test Task
 
+![CI](https://github.com/DmitriyOT/DevOps-Example/actions/workflows/ci.yml/badge.svg)
+
 Простое веб-приложение на Python с обратным прокси на nginx, развёрнутое в Docker-контейнерах через Docker Compose.
 
 ## Структура проекта
 
 ```
 .
+├── .github/
+│   └── workflows/
+│       └── ci.yml
 ├── backend/
 │   ├── Dockerfile
 │   └── app.py
@@ -90,3 +95,14 @@ docker compose down --rmi local
 - Python 3.12 (официальный образ `python:3.12-alpine`)
 - nginx 1.27 (официальный образ `nginx:1.27-alpine`)
 - Docker / Docker Compose
+- GitHub Actions (CI)
+
+## CI
+
+При каждом push в `main` и на pull request запускается pipeline
+(`.github/workflows/ci.yml`), который:
+
+1. Собирает Docker-образы (`docker compose build`).
+2. Поднимает весь стек (`docker compose up -d`).
+3. Выполняет smoke-тест: запрос через nginx должен вернуть `Hello from DevOps Example!`.
+4. Проверяет, что backend недоступен с хоста напрямую (только через nginx).
