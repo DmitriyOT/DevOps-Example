@@ -2,9 +2,11 @@
 
 ![CI](https://github.com/DmitriyOT/DevOps-Example/actions/workflows/ci.yml/badge.svg)
 
-Простое веб-приложение на Python с обратным прокси на nginx, развёрнутое в Docker-контейнерах через Docker Compose.
+[Русская версия](README.ru.md)
 
-## Структура проекта
+A simple Python web application with an nginx reverse proxy, deployed in Docker containers using Docker Compose.
+
+## Project Structure
 
 ```
 .
@@ -20,89 +22,89 @@
 └── README.md
 ```
 
-## Архитектура
+## Architecture
 
 ```
-Пользователь
+User
     │
     ▼
-http://localhost:80  (порт хоста)
+http://localhost:80  (host port)
     │
-    nginx (контейнер devops-example-nginx)
+    nginx (container devops-example-nginx)
     │
     ▼ proxy_pass → http://backend:8080
-    backend (контейнер devops-example-backend)
+    backend (container devops-example-backend)
 ```
 
-- **backend** — HTTP-сервер на Python (`http.server`), слушает порт `8080`, доступен только внутри Docker-сети.
-- **nginx** — официальный образ nginx, принимает HTTP-запросы на порту `80`, проксирует их на backend.
-- Взаимодействие между сервисами происходит по внутренней Docker-сети `devops-example-network` через имена сервисов.
+- **backend** — a Python HTTP server (`http.server`), listens on port `8080`, reachable only inside the Docker network.
+- **nginx** — the official nginx image, accepts HTTP requests on port `80` and proxies them to the backend.
+- The services communicate over the internal Docker network `devops-example-network` via service names.
 
-## Требования
+## Requirements
 
 - [Docker](https://docs.docker.com/get-docker/)
 - [Docker Compose](https://docs.docker.com/compose/install/)
 
-## Как запустить проект
+## How to Run the Project
 
-1. Клонируйте репозиторий:
+1. Clone the repository:
 
    ```bash
-   git clone <URL-репозитория>
-   cd <имя-репозитория>
+   git clone <repository-url>
+   cd <repository-name>
    ```
 
-2. Соберите и запустите контейнеры:
+2. Build and start the containers:
 
    ```bash
    docker compose up -d --build
    ```
 
-3. Убедитесь, что контейнеры запущены:
+3. Make sure the containers are running:
 
    ```bash
    docker compose ps
    ```
 
-## Как проверить результат
+## How to Verify the Result
 
-Выполните запрос к nginx:
+Send a request to nginx:
 
 ```bash
 curl http://localhost
 ```
 
-Ожидаемый ответ:
+Expected response:
 
 ```
 Hello from DevOps Example!
 ```
 
-## Остановка и удаление контейнеров
+## Stopping and Removing Containers
 
 ```bash
 docker compose down
 ```
 
-Если необходимо также удалить собранные образы:
+If you also need to remove the built images:
 
 ```bash
 docker compose down --rmi local
 ```
 
-## Используемые технологии
+## Technologies Used
 
-- Python 3.12 (официальный образ `python:3.12-alpine`)
-- nginx 1.27 (официальный образ `nginx:1.27-alpine`)
+- Python 3.12 (official `python:3.12-alpine` image)
+- nginx 1.27 (official `nginx:1.27-alpine` image)
 - Docker / Docker Compose
 - GitHub Actions (CI)
 
 ## CI
 
-При каждом push в `main` и на pull request запускается pipeline
-(`.github/workflows/ci.yml`), который:
+On every push to `main` and on every pull request, a pipeline
+(`.github/workflows/ci.yml`) runs that:
 
-1. Собирает Docker-образы (`docker compose build`).
-2. Поднимает весь стек (`docker compose up -d`).
-3. Выполняет smoke-тест: запрос через nginx должен вернуть `Hello from DevOps Example!`.
-4. Проверяет, что backend недоступен с хоста напрямую (только через nginx).
+1. Builds the Docker images (`docker compose build`).
+2. Brings up the whole stack (`docker compose up -d`).
+3. Runs a smoke test: a request through nginx must return `Hello from DevOps Example!`.
+4. Verifies that the backend is not reachable from the host directly (only through nginx).
